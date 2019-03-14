@@ -1,4 +1,14 @@
 # domo
+_simple domain modeling tool_
+
+## Sample syntax
+```
+Instrument : Electric | Acoustic | Bass | Ukelele
+Course.lessons : Array(Lesson)
+Course.song : Song
+Course.instrument : Instrument
+Lesson.video : Video
+```
 
 ## Contributing
 
