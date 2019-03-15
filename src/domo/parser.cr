@@ -93,7 +93,6 @@ class Domo::Parser
       previous_token = token
     end
 
-    @types.each { |t| puts t }
     self
   end
 
@@ -102,6 +101,11 @@ class Domo::Parser
     if invalid_types.size > 0
       raise "Invalid types provided: #{invalid_types.map(&.name)}"
     end
+    self
+  end
+
+  def print_structure(io = STDERR)
+    @types.each { |t| io.puts(t) }
   end
 end
 
