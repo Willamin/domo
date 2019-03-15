@@ -4,10 +4,10 @@ _simple domain modeling tool_
 ## Sample syntax
 ```
 Instrument : Electric | Acoustic | Bass | Ukelele
-Course.lessons : Array(Lesson)
-Course.song : Song
 Course.instrument : Instrument
+Course.song : Song
 Lesson.video : Video
+# Course.lessons : Array(Lesson)
 ```
 
 ## Contributing
