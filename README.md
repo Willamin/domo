@@ -1,6 +1,9 @@
 # domo
 _simple domain modeling tool_
 
+## Warning
+The parser is awfully written and not documented. It _needs_ a refactor.
+
 ## Sample syntax
 ```
 Instrument : Electric | Acoustic | Bass | Ukelele
