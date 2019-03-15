@@ -10,7 +10,7 @@ class Domo::Parser
     self.new(File.open(filename).gets_to_end)
   end
 
-  def tokenize(verbose)
+  def tokenize(verbose = false)
     @tokens = @contents
       .split(/(\#.+\n|\#.+\Z)/)
       .reject(&.starts_with?("#"))
@@ -21,7 +21,7 @@ class Domo::Parser
     self
   end
 
-  def parse(verbose)
+  def parse(verbose = false)
     previous = :none
     previous_token = ""
     type_to_act_on : Type? = nil
