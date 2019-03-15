@@ -10,6 +10,14 @@ Lesson.video : Video
 # Course.lessons : Array(Lesson)
 ```
 
+## Features
+
+- [x] Parse union types
+- [x] Parse member types
+- [x] Verify types aren't union and member
+- [x] Handle comments
+- [ ] Handle generic types
+
 ## Contributing
 
 1. Fork it ( https://github.com/Willamin/domo/fork )
