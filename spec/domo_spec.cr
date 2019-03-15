@@ -1,9 +1,28 @@
 require "./spec_helper"
 
 describe Domo do
-  # TODO: Write tests
+  test "that it works on a snapshot" do
+    actual = String.build do |s|
+      Domo::Parser.from_file("./sample")
+        .tokenize
+        .parse
+        .check_for_invalid
+        .print_structure(s)
+    end
 
-  test "that it works" do
-    assert 0 == 1
+    expected = <<-EOF
+      Instrument : Electric | Acoustic | Bass | Ukelele
+      Electric
+      Acoustic
+      Bass
+      Ukelele
+      Course :: .instrument : Instrument, .song : Song
+      Song
+      Lesson :: .video : Video
+      Video
+
+      EOF
+
+    assert actual == expected
   end
 end
