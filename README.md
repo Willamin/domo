@@ -1,6 +1,8 @@
 # domo
 _simple domain modeling tool_
 
+Domo aims to be a simple, yet powerful enough domain modeling language. Using a minimal and understandable syntax, it should allow the user to quickly write down domain models while verifying that the types are safe. Ideally this tool should be able to output an ERD of the type tree, but it is not to that point yet.
+
 ## Warning
 The parser is awfully written and not documented. It _needs_ a refactor.
 
@@ -20,6 +22,7 @@ Lesson.video : Video
 - [x] Verify types aren't union and member
 - [x] Handle comments
 - [ ] Handle generic types
+- [ ] Produce an ERD
 
 ## Contributing
 
