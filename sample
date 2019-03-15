@@ -1,0 +1,5 @@
+Instrument : Electric | Acoustic | Bass | Ukelele
+Course.instrument : Instrument
+Course.song : Song
+Lesson.video : Video
+# Course.lessons : Array(Lesson)
