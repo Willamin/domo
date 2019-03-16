@@ -22,14 +22,13 @@ class Domo::StateMachine(T)
   end
 
   def add_valid(from_state : T, to_state : T)
-    puts "adding #{from_state} -> #{to_state}"
     valid_to = @valid_changes[from_state]? || Set(T).new
     valid_to << to_state
     @valid_changes[from_state] = valid_to
   end
 
   def next(next_state : T, error = "Invalid State Change: #{@current_state} -> #{next_state}")
-    raise error unless @valid_changes[@current_state].includes?(next_state)
+    raise error unless @valid_changes[@current_state]?.try(&.includes?(next_state))
     @current_state = next_state
   end
 end

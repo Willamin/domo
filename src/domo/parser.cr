@@ -1,5 +1,15 @@
 require "colorize"
 
+enum Previous
+  None
+  Type
+  Declaration
+  Or
+  MemberDeclaration
+  Member
+  Access
+end
+
 class Domo::Parser
   @tokens = Array(String).new
   @types = Set(Type).new
@@ -22,7 +32,19 @@ class Domo::Parser
   end
 
   def parse(verbose = false)
-    previous = :none
+    machine = Domo::StateMachine(Previous).new(Previous::None)
+    [{Previous::None, Previous::Type},
+     {Previous::Type, Previous::Declaration},
+     {Previous::Declaration, Previous::Type},
+     {Previous::Type, Previous::Or},
+     {Previous::Or, Previous::Type},
+     {Previous::Type, Previous::Type},
+     {Previous::Type, Previous::Access},
+     {Previous::Access, Previous::Member},
+     {Previous::Member, Previous::MemberDeclaration},
+     {Previous::MemberDeclaration, Previous::Type},
+    ].each { |from, to| machine.add_valid(from, to) }
+
     previous_token = ""
     type_to_act_on : Type? = nil
     member_to_declare : String? = nil
@@ -30,7 +52,7 @@ class Domo::Parser
     @tokens.each_with_index do |token, index|
       if verbose
         print "current token       "; pp token.colorize(:yellow)
-        print "previous            "; pp previous.colorize(:red)
+        print "current_state       "; pp machine.current_state.colorize(:red)
         print "previous_token      "; pp previous_token.colorize(:magenta)
         print "type_to_act_on      "; puts (type_to_act_on.try(&.name) || "nil").colorize(:blue)
         print "member_to_declare   "; puts (member_to_declare || "nil").colorize(:green)
@@ -40,54 +62,45 @@ class Domo::Parser
 
       case token
       when .type?
-        if previous == :none || previous == :type
+        case machine.current_state
+        when .none?, .type?
           type = Type.new(token)
           @types << type
-          previous = :type
-        end
-
-        if previous == :declaration || previous == :or
+          machine.next(Previous::Type)
+        when .declaration?, .or?
           type = Type.new(token)
           @types << type
           type_to_act_on.try(&.subtypes.add(type))
-          previous = :type
-        end
-
-        if previous == :member_declaration
+          machine.next(Previous::Type)
+        when .member_declaration?
           type = @types.find(Type.new(token)) { |t| t.name == token }
           @types << type
           type_to_act_on.try { |t| t.members[member_to_declare.not_nil!] = type.not_nil! }
-          previous = :type
+          machine.next(Previous::Type)
+        else
+          raise "Invalid token: #{token}"
         end
       when .declaration?
-        if previous == :type
+        case machine.current_state
+        when .type?
           type_to_act_on = @types.find { |t| t.name == previous_token }
-          previous = :declaration
-        end
-
-        if previous == :member
-          previous = :member_declaration
+          machine.next(Previous::Declaration)
+        when .member?
+          machine.next(Previous::MemberDeclaration)
+        else
+          raise "Invalid token: #{token}"
         end
       when .or?
-        if previous != :type
-          raise "Can only use or operator when preceded by a type (i=#{index})"
-        end
-        previous = :or
+        machine.next(Previous::Or, "Can only use or operator when preceded by a type")
       when .access?
-        if previous != :type
-          raise "Cannot access something other than a type (i=#{index})"
-        end
+        machine.next(Previous::Access, "Cannot access something other than a type")
         type_to_act_on = @types.find { |t| t.name == previous_token }
-        previous = :access
       when .member?
-        if previous != :access
-          raise "Cannot define a member unless preceded by an access token (i=#{index})"
-        end
         member_to_declare = token
-        previous = :member
+        machine.next(Previous::Member, "Cannot define a member unless preceded by an access token")
       else
         @types.each { |t| puts t }
-        raise "Unknown token: #{token} (i=#{index})"
+        raise "Unknown token: #{token}"
       end
 
       previous_token = token
